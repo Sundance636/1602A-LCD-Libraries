@@ -11,41 +11,11 @@ void initLCD() {
     setInputType(GPIO_PIN_RESET);//set to instruction mode
     setReadWriteMode(GPIO_PIN_RESET);//set to write
 
-    //setting 4 bit mode
-    HAL_GPIO_WritePin(DB7_PORT, DB7_PIN, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(DB6_PORT, DB6_PIN, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(DB5_PORT, DB5_PIN, GPIO_PIN_SET);
-    HAL_GPIO_WritePin(DB4_PORT, DB4_PIN, GPIO_PIN_RESET);
+    //Setting LCD to 4-bit mode
+    sendInstruction(0x28);
 
-    setEnableSignal(GPIO_PIN_SET);
-    setEnableSignal(GPIO_PIN_RESET);
- 
-    HAL_GPIO_WritePin(DB7_PORT, DB7_PIN, GPIO_PIN_SET);
-    HAL_GPIO_WritePin(DB6_PORT, DB6_PIN, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(DB5_PORT, DB5_PIN, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(DB4_PORT, DB4_PIN, GPIO_PIN_RESET);
-
-    setEnableSignal(GPIO_PIN_SET);
-    setEnableSignal(GPIO_PIN_RESET);
-
-
-    //display parameters
-    HAL_GPIO_WritePin(DB7_PORT, DB7_PIN, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(DB6_PORT, DB6_PIN, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(DB5_PORT, DB5_PIN, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(DB4_PORT, DB4_PIN, GPIO_PIN_RESET);
-    
-    setEnableSignal(GPIO_PIN_SET);
-    setEnableSignal(GPIO_PIN_RESET);
-
-    HAL_Delay(30);    //lower
-    HAL_GPIO_WritePin(DB7_PORT, DB7_PIN, GPIO_PIN_SET);
-    HAL_GPIO_WritePin(DB6_PORT, DB6_PIN, GPIO_PIN_SET);
-    HAL_GPIO_WritePin(DB5_PORT, DB5_PIN, GPIO_PIN_SET);
-    HAL_GPIO_WritePin(DB4_PORT, DB4_PIN, GPIO_PIN_SET);
-    
-    setEnableSignal(GPIO_PIN_SET);    
-    setEnableSignal(GPIO_PIN_RESET);
+    //Display parameters of LCD
+    sendInstruction(0x0F);
 
     return;
 }
@@ -112,6 +82,7 @@ void sendData(int data) {
 */
 void printstr(char* string) {
     int i = 0;
+
     while(string[i] !='\0') {
         sendData( (int)string[i] );
         HAL_Delay(20);
