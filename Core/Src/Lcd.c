@@ -11,8 +11,35 @@ void initLCD() {
     setInputType(GPIO_PIN_RESET);//set to instruction mode
     setReadWriteMode(GPIO_PIN_RESET);//set to write
 
+    sendInstruction( 0x30 );
+    HAL_Delay(4);
+    sendInstruction( 0x30 );
+    HAL_Delay(4);
+    sendInstruction( 0x30 );
+    HAL_Delay(4);
+
+
+    //now in 4bit mode
+    sendInstruction( 0x20 );
+    HAL_Delay(4);
+
+    //disp settings
+    sendInstruction( 0x28 );
+    HAL_Delay(4);
+
+    //disp on
+    sendInstruction( 0x08 );
+    HAL_Delay(4);
+
+    //clear display
+    sendInstruction( 0x01 );
+    HAL_Delay(4);
+    //entry mode
+    sendInstruction( 0x06 );
+    HAL_Delay(4);
+
     //Setting LCD to 4-bit mode
-    sendInstruction(0x28);
+    //sendInstruction(0x28);
 
     //Display parameters of LCD
     sendInstruction(0x0F);
@@ -165,3 +192,4 @@ void setEnableSignal(GPIO_PinState PIN_STATE) {
     HAL_GPIO_WritePin(ENABLE_SIG_PORT, ENABLE_SIG_PIN, PIN_STATE);
     return;
 }
+
