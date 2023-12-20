@@ -34,15 +34,31 @@
 #define DB7_PORT GPIOE
 
 void initLCD();
+void InitLCD(int);
+
 void send_To_LCD4BIT(int);
 void sendInstruction(int);
 void sendData(int);
+
 void printstr(char*);
+
 void clearDisplay();
+void returnCursor();
+void cursorRight();
+void cursorLeft();
+void displayShift();
+void toggleDisplay();
+void toggleDisplay(int,int,int);
+void setCursorBlink(int);
+void customChar();
+
+
 void ToggleInputType();
 void setInputType(GPIO_PinState);
+
 void ToggleRWmode();
 void setReadWriteMode(GPIO_PinState);
+
 void ToggleES();
 void setEnableSignal(GPIO_PinState);
 
