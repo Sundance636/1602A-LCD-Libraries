@@ -16,14 +16,14 @@
 #define RW_PIN_PORT GPIOE
 #define ENABLE_SIG_PIN GPIO_PIN_9
 #define ENABLE_SIG_PORT GPIOE
-#define DB0_PIN
+#define DB0_PIN GPIO_PIN_14
 #define DB0_PORT GPIOE
-#define DB1_PIN
+#define DB1_PIN GPIO_PIN_15
 #define DB1_PORT GPIOE
-#define DB2_PIN
-#define DB2_PORT GPIOE
-#define DB3_PIN
-#define DB3_PORT GPIOE
+#define DB2_PIN GPIO_PIN_13
+#define DB2_PORT GPIOB
+#define DB3_PIN GPIO_PIN_14
+#define DB3_PORT GPIOB
 #define DB4_PIN GPIO_PIN_10
 #define DB4_PORT GPIOE
 #define DB5_PIN GPIO_PIN_11
@@ -33,10 +33,16 @@
 #define DB7_PIN GPIO_PIN_13
 #define DB7_PORT GPIOE
 
-void initLCD();
-void InitLCD(int);
+#define BITMODE_8BIT 1u
+#define BITMODE_4BIT 0u
+
+extern uint32_t screenMode;//make accessible in other files
+
+void quickInitLCD();
+void InitLCD(uint32_t);
 
 void send_To_LCD4BIT(int);
+void send_To_LCD8BIT(int);
 void sendInstruction(int);
 void sendData(int);
 

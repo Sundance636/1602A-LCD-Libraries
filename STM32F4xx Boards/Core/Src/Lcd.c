@@ -1,11 +1,13 @@
-#include "Lcd.h"
+#include "../Inc/Lcd.h"
+
+uint32_t screenMode = 0;
 
 /**
  * @brief Initializes the LCD to 4bit mode/2 lines/and 5x8 font size
  *        also turns display on, and cursor on.
  * @retval none
 */
-void initLCD() {
+void quickInitLCD() {
     HAL_Delay(200);//power on init time
     //setEnableSig(GPIO_PIN_SET);//set enable signal
     setInputType(GPIO_PIN_RESET);//set to instruction mode
@@ -26,6 +28,64 @@ void initLCD() {
     //disp settings
     sendInstruction( 0x28 );
     HAL_Delay(4);
+
+    //disp on
+    sendInstruction( 0x08 );
+    HAL_Delay(4);
+
+    //clear display
+    sendInstruction( 0x01 );
+    HAL_Delay(4);
+    //entry mode
+    sendInstruction( 0x06 );
+    HAL_Delay(4);
+
+    //Setting LCD to 4-bit mode
+    //sendInstruction(0x28);
+
+    //Display parameters of LCD
+    sendInstruction(0x0F);
+
+    return;
+}
+
+/**
+ * @brief Initializes the LCD to either 4-bit mode or 8-bit mode /2 lines / and 5x8 font size
+ *        also turns the display on, cursor and cursor blink on.
+ * @param BITMODE  if BITMODE is set to 0 then the LCD is initialized in 4-bit mode
+ *                 else if it is set to 1 then the LCD is initialized in 8-bit mode
+ * @retval none
+*/
+void InitLCD(uint32_t BITMODE) {
+    if( BITMODE > BITMODE_8BIT ) return;//only allows for 1 or 0 as function args
+
+    screenMode = BITMODE; 
+
+    HAL_Delay(200);//power on init time
+    //setEnableSig(GPIO_PIN_SET);//set enable signal
+    setInputType(GPIO_PIN_RESET);//set to instruction mode
+    setReadWriteMode(GPIO_PIN_RESET);//set to write
+
+    sendInstruction( 0x30 );
+    HAL_Delay(4);
+    sendInstruction( 0x30 );
+    HAL_Delay(4);
+    sendInstruction( 0x30 );
+    HAL_Delay(4);
+
+    if(screenMode == BITMODE_8BIT) {
+        //disp settings
+        sendInstruction( 0x38 );
+        HAL_Delay(4);
+    }
+    else {
+        //now in 4bit mode
+        sendInstruction( 0x20 );
+        HAL_Delay(4);
+        //disp settings
+        sendInstruction( 0x28 );
+        HAL_Delay(4);
+    }
 
     //disp on
     sendInstruction( 0x08 );
@@ -72,6 +132,35 @@ void send_To_LCD4BIT(int data) {
 }
 
 /**
+ * @brief Sends All 8 bits to each corresponding line on the databus
+ * @param data the instruction/data being sent to the LCD, all 8
+ *             bits are taken of inputted integer.
+ * @retval none
+*/
+void send_To_LCD8BIT(int data) {
+    int bits[8] = {0};
+
+    for(int i = 0; i < 8; i++) {
+        bits[i] = (data >> i) & 1;
+    }
+    
+    
+    HAL_GPIO_WritePin(DB7_PORT, DB7_PIN, bits[7]);
+    HAL_GPIO_WritePin(DB6_PORT, DB6_PIN, bits[6]);
+    HAL_GPIO_WritePin(DB5_PORT, DB5_PIN, bits[5]);
+    HAL_GPIO_WritePin(DB4_PORT, DB4_PIN, bits[4]);
+    HAL_GPIO_WritePin(DB3_PORT, DB3_PIN, bits[3]);
+    HAL_GPIO_WritePin(DB2_PORT, DB2_PIN, bits[2]);
+    HAL_GPIO_WritePin(DB1_PORT, DB1_PIN, bits[1]);
+    HAL_GPIO_WritePin(DB0_PORT, DB0_PIN, bits[0]);
+
+    setEnableSignal(GPIO_PIN_SET);
+    setEnableSignal(GPIO_PIN_RESET);
+
+    return;
+}
+
+/**
  * @brief This function sends a specified instruction to the LCD
  *        in 4 bit, sending the upper half byte then the lower half byte.
  * @param ins the intstruction being sent to LCD.
@@ -80,9 +169,14 @@ void send_To_LCD4BIT(int data) {
 void sendInstruction(int ins) {
     setInputType(GPIO_PIN_RESET);//set to instruction mode
 
-    send_To_LCD4BIT(ins>>4);//upper 4 bits
-    send_To_LCD4BIT(ins);//lower 4 bits
-
+    if(screenMode == BITMODE_4BIT) {
+        send_To_LCD4BIT(ins>>4);//upper 4 bits
+        send_To_LCD4BIT(ins);//lower 4 bits
+    }
+    else {
+        send_To_LCD8BIT(ins);
+    }
+    
     return;
 }
 
@@ -95,8 +189,13 @@ void sendInstruction(int ins) {
 void sendData(int data) {
     setInputType(GPIO_PIN_SET);//set to data mode
 
-    send_To_LCD4BIT(data>>4);//upper 4 bits
-    send_To_LCD4BIT(data);//lower 4 bits
+    if(screenMode == BITMODE_4BIT) {
+        send_To_LCD4BIT(data>>4);//upper 4 bits
+        send_To_LCD4BIT(data);//lower 4 bits
+    }
+    else {
+        send_To_LCD8BIT(data);
+    }
 
     return;
 }
