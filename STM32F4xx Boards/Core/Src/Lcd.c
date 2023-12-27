@@ -61,7 +61,7 @@ void InitLCD(uint32_t BITMODE) {
 
     screenMode = BITMODE; 
 
-    HAL_Delay(200);//power on init time
+    HAL_Delay(400);//power on init time
     //setEnableSig(GPIO_PIN_SET);//set enable signal
     setInputType(GPIO_PIN_RESET);//set to instruction mode
     setReadWriteMode(GPIO_PIN_RESET);//set to write
@@ -225,6 +225,112 @@ void printstr(char* string) {
 void clearDisplay() {
     sendInstruction(0X01);//instruction to clear display
     HAL_Delay(50);
+    return;
+}
+
+/**
+ * @brief Returns the cursor to the top left of the LCD screen
+ * @retval none
+*/
+void returnCursor() {
+    sendInstruction(0x02);
+    HAL_Delay(50);
+
+    return;
+}
+
+/**
+ * @brief makes the cursor Increment to the right, therefore printing right to left
+ * @retval none
+*/
+void cursorRight() {
+    sendInstruction(0x06);
+    HAL_Delay(50);
+
+    return;
+}
+
+/**
+ * @brief makes the cursor Increment to the left, therefore printing left to right
+ * @retval none
+*/
+void cursorLeft() {
+    sendInstruction(0x04);
+    HAL_Delay(50);
+
+    return;
+}
+
+/**
+ * @brief Sets the cursor position on the LCD screen
+ * @param row the index of the row/line you want to select, from 0 to 1
+ * @param column the index of the column you want to select, from 0 to 15
+ * @retval none
+*/
+void setCursor(uint32_t row, uint32_t column) {
+    returnCursor();//reset cursor position to assume cursor is at 0,0
+
+    for(int j = 0; j < column + (40 * row); j++) {
+        sendInstruction(0x14);
+    }
+
+    HAL_Delay(50);
+    
+    return;
+}
+
+/**
+ * @brief Shifts/Scrolls the entire display left or right by one character depending of specification
+ * @param Direction the direction to shift the display, left(0) or right(1 or non zero int).
+ * @retval none
+*/
+void displayShift(uint32_t Direction) {
+    if(Direction == 1u) {
+        sendInstruction(0x1C);//scroll right
+    }
+    else {
+        sendInstruction(0x18);//scroll left
+    }
+
+    return;
+}
+
+/**
+ * @brief Configures the display parameter, Display, Cursor, and Cursor blink
+ * 
+ * @param Display Determines whether the display is on or off, with 1 or 0 respectively.
+ * @param Cursor sets the cursor On == 1, Off == 0
+ * @param Blink sets the cursor blink On == 1, Off == 0
+ * 
+ * @retval none
+*/
+void setDisplayParams(int Display, int Cursor, int Blink) {
+    uint32_t disp = 0, curs = 0, blnk = 0;
+
+    if(Display == 1) {
+        disp = 0x0C;
+    }
+    if(Cursor == 1) {
+        curs = 0x0A;
+    }
+    if(Blink == 1) {
+        blnk = 0x09;
+    }
+
+
+    sendInstruction( 0x08 | disp | curs | blnk );
+
+    return;
+}
+
+/**
+ * @brief Shifts/Scrolls the entire display left or right by one character depending of specification
+ * @param Direction the direction to shift the display, left(0) or right(1 or non zero int).
+ * @retval none
+*/
+void customChar() {
+
+
     return;
 }
 

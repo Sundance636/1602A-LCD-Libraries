@@ -52,10 +52,9 @@ void clearDisplay();
 void returnCursor();
 void cursorRight();
 void cursorLeft();
+void setCursor(uint32_t, uint32_t);
 void displayShift();
-void toggleDisplay();
-void toggleDisplay(int,int,int);
-void setCursorBlink(int);
+void setDisplayParams(int,int,int);
 void customChar();
 
 
